@@ -92,7 +92,7 @@ const registerClient = async ({project_Name , client_url , support_mail ,redirec
 const oidcService = async ()=>{
     const services = {
         issuer : "http://localhost:4000",
-        authorization_endpoint : "http://localhost:4000/oidc/takeIt",
+        authorization_endpoint : "http://localhost:4000/oidc/takeit",
         token_endpoint : "http://localhost:4000/oidc/token",
         userinfo_endpoint : "http://localhost:4000/oidc/userinfo",
         jwks_uri:"http://localhost:4000/oidc/getPublicToken"
