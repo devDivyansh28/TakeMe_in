@@ -1,24 +1,12 @@
-import { generateKeyPair, exportJWK, exportPKCS8, exportSPKI } from "jose";
-import fs from "node:fs"
-import path from "node:path";
+import { importPKCS8 , importSPKI } from "jose";
 
+export async function getPrivateKey() {
+  const pem = process.env.PRIVATE_KEY.replace(/\\n/g, "\n");
+  return await importPKCS8(pem, "RS256");
+}
 
-export const generatePair = async ()=>{
-    const {publicKey , privateKey}= await generateKeyPair("RS256");
-
-     return {publicKey , privateKey}
-     }
-
-
-const {publicKey , privateKey} = await generatePair();
-
-
-// export const publicJwk = await exportJWK(publicKey); 
-// export const privateJwk = await exportJWK(privateKey); 
-
-const privatePem = await exportPKCS8(privateKey);
-const publicPem = await exportSPKI(publicKey);
-
-fs.writeFileSync("../../../private.pem", privatePem);
-fs.writeFileSync("../../../public.pem", publicPem);
+export async function getPublicKey() {
+  const pem = process.env.PUBLIC_KEY.replace(/\\n/g, "\n");
+  return await importSPKI(pem, "RS256");
+}
 

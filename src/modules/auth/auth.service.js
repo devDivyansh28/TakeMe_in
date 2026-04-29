@@ -1,7 +1,9 @@
+
 import ApiError from "../../common/utils/api_error.js";
-// import {publicJwk} from "../../common/utils/jose.utils.js"
 import { exportJWK } from "jose";
-import fs from "node:fs"
+
+import { getPublicKey } from "../../common/utils/jose.utils.js";
+
 import { generateVerificationToken 
     // , generateAccessToken ,
     //  generateRefreshToken , verifyAcessToken , verifyRefreshToken , hashToken
@@ -66,14 +68,12 @@ const userinfo = async ()=>{
 }
 
 const getPublicToken = async ()=>{
-    const publicCertificate = fs.readFileSync('../../../public.pem');
-    publicCertificate = await exportJWK(publicCertificate);
-    publicCertificate.alg = "RS256"
-    publicCertificate.use = "sig",
-    publicCertificate.kid = "key_v1"
-     return {
-        keys : [publicCertificate]
-     }
+    
+    const jwk = await exportJWK(await getPublicKey());
+    
+    return {
+        keys : [{...jwk , use : 'sig' , alg : 'RS256'}]
+    }
 }
 
 // const login = async ({email,password})=>{
