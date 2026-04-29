@@ -1,27 +1,42 @@
 import ApiError from "../../common/utils/api_error.js"; 
-import { verifyAcessToken } from "../../common/utils/jwt.utils.js";
+// import { verifyAcessToken } from "../../common/utils/jwt.utils.js";
+
+import { jwtVerify } from "jose";
+
 
 import User from "./auth.model.js"
+import { getPublicKey } from "../../common/utils/jose.utils.js";
 
-const authenticate = async (req, res , next)=>{
-    let token;
-    if(req.headers.authorization?.startsWith("Bearer")){
-        token = req.headers.authorization.split(" ")[1];
-    }
+const authenticate = async (req, res, next) => {
+  try {
+    // Bug 1 fixed — added !
+    const accesstoken = req.cookies?.accesstoken;
+    if (!accesstoken) throw ApiError.unauthorized("No token provided");
 
-    if(!token) throw ApiError.unauthorized("Not Authenticated");
-    const decoded = verifyAcessToken(token);
-    const user = await User.findById(decoded.id);
-    if(!user) throw ApiError.unauthorized("User No longer exists")
+    // Bug 2 fixed — normal function call
+    const { payload } = await jwtVerify(accesstoken, await getPublicKey(), {
+      algorithms: ["RS256"],
+    });
 
+    // Bug 3 fixed — correct claim name
     req.user = {
-        id:user._id,
-        role:user.role,
-        name:user.name,
-        email:user.email,
+      id: payload.sub,
+      email: payload.email,
+      given_name: payload.given_name, // ✅
+      role: payload.role,
     };
+
     next();
-}
+  } catch (error) {
+    if (error.code === "ERR_JWT_EXPIRED") {
+      return next(ApiError.unauthorized("Token has expired"));
+    }
+    if (error.code === "ERR_JWS_INVALID") {
+      return next(ApiError.unauthorized("Invalid Token"));
+    }
+    return next(error);
+  }
+};
 
 const authorize = (...roles)=>{
     return (req,res,next)=>{

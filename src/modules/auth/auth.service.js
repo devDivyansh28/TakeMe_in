@@ -1,13 +1,16 @@
 
 import ApiError from "../../common/utils/api_error.js";
-import { exportJWK } from "jose";
+import { exportJWK , SignJWT} from "jose";
 
 import { getPublicKey } from "../../common/utils/jose.utils.js";
 
-import { generateVerificationToken 
-    // , generateAccessToken ,
-    //  generateRefreshToken , verifyAcessToken , verifyRefreshToken , hashToken
-    } from "../../common/utils/jwt.utils.js";
+import { getPrivateKey } from "../../common/utils/jose.utils.js";
+
+// import { generateVerificationToken 
+//     // , generateAccessToken ,
+//     //  generateRefreshToken , verifyAcessToken , verifyRefreshToken , hashToken
+//     } from "../../common/utils/jwt.utils.js";
+
 
 
 
@@ -20,28 +23,51 @@ const register = async ({name,email,password,role})=>{
     const existing = await User.findOne({email})
     if(existing) throw ApiError.conflict("Email Already Exists")
     
-    const {rawToken,hashedToken} = generateVerificationToken()
+    // const {rawToken,hashedToken} = generateVerificationToken()
 
     const user = await User.create({
         name,
         email,
         password,
         role,
-        verificationToken:hashedToken,
+        // verificationToken:hashedToken,
     })
 
-    try{
-        await sendVerificationEmail(email,rawToken)
-    } catch (error) {
-        console.log(error)
-    }
+    // try{
+    //     await sendVerificationEmail(email,rawToken)
+    // } catch (error) {
+    //     console.log(error)
+    // }
 
     const userObj = user.toObject()
     delete userObj.password
-    delete userObj.verificationToken
-
+    // delete userObj.verificationToken
     return userObj
 }
+
+const login = async ({email , password})=>{
+    const user = await User.findOne({email}).select('+password');
+    if(!user) throw ApiError.unauthorized("Invalid Email Address");
+
+    const isMatch = await user.comparePassword(password);
+    if(!isMatch) throw ApiError.unauthorized("Invalid Email or password");
+
+    const token = await new SignJWT({
+      sub: user._id.toString(),
+      email: user.email,
+      given_name : user.name,
+      role : user.role
+    })
+      .setProtectedHeader({ alg: "RS256", kid: "key_v1" })
+      .setIssuedAt() 
+      .setExpirationTime("24h")
+      .sign(await getPrivateKey());
+
+    return {token};
+    
+}
+
+
 
 const oidcService = async ()=>{
     const services = {
@@ -72,7 +98,7 @@ const getPublicToken = async ()=>{
     const jwk = await exportJWK(await getPublicKey());
     
     return {
-        keys : [{...jwk , use : 'sig' , alg : 'RS256'}]
+        keys : [{...jwk , use : 'sig' , alg : 'RS256' , kid : "key_v1"}]
     }
 }
 
@@ -142,11 +168,11 @@ const getPublicToken = async ()=>{
 //     // TODO : mail bhejna Nhi aata
 // }
 
-// const getMe = async (userID)=> {
-//    const user = await User.findById(userId);
-//    if(!user) throw ApiError.notfound("User not found");
-//    return user;
-// }
+const getMe = async (userId)=> {
+   const user = await User.findById(userId);
+   if(!user) throw ApiError.notFound("User not found");
+   return user;
+}
 
 
 // const verifyEmail = async (token) =>{
@@ -164,7 +190,7 @@ const getPublicToken = async ()=>{
 // };
 
 
-export {register , oidcService , takeit , handleToken , userinfo , getPublicToken 
+export {register ,login ,getMe ,  oidcService , takeit , handleToken , userinfo , getPublicToken 
     // , login , refresh , logout , forgotPassword , getMe , verifyEmail
 }
 

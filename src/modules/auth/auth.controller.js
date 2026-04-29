@@ -37,16 +37,17 @@ const getPublicToken = async (req,res)=>{
     const response = await authService.getPublicToken();
     return res.status(200).json(response);
 }
-// const login = async (req,res)=>{
-//     const {user , accessToken , refreshToken} = await authService.login(req.body)
-//     res.cookie("refreshToken",refreshToken,{
-//         httpOnly: true,
-//         secure : true,
-//         maxAge : 7*24*60*60*1000,
-//     });
+const login = async (req,res)=>{
 
-//     ApiResponse.ok(res,"Login successfull",{user,accessToken});
-// }
+    const {token} = await authService.login(req.body)
+    res.cookie("accesstoken",token,{
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        maxAge : 7*24*60*60*1000,
+    });
+
+    ApiResponse.ok(res,"Login successfull");
+}
 
 // const logout = async (req,res)=>{
 //     await authService.logout(req.user.id)
@@ -54,9 +55,9 @@ const getPublicToken = async (req,res)=>{
 //     ApiResponse.ok(res,"Logout Successfull")
 // }
 
-// const getMe = async (req,res)=>{
-//     const user = await authService.getMe(req.user.id);
-//     ApiResponse.ok(res,"User Profile",user);
-// }
+const getMe = async (req,res)=>{
+    const user = await authService.getMe(req.user.id);
+    ApiResponse.ok(res,"User Profile",user);
+}
 
-export { register , oidc , takeit , handleToken , userinfo , getPublicToken };
+export { register , login , getMe,   oidc , takeit , handleToken , userinfo , getPublicToken };
