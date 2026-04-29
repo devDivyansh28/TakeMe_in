@@ -14,6 +14,16 @@ const register = async (req, res) => {
   );
 };
 
+const registerClient = async (req , res)=>{
+  const client = await authService.registerClient(req.body);
+
+  ApiResponse.created(
+    res,
+    "Client Registration Successfull",
+    client
+  )
+}
+
 
 const oidc = async (req,res)=> {
   const response = await authService.oidcService();
@@ -22,16 +32,13 @@ const oidc = async (req,res)=> {
 }
 
 const takeit = async (req,res)=>{
-
+    return res.sendFile(process.cwd() + '/public/dashboard.html');
 }
 
 const handleToken = async (req,res)=>{
 
 }
 
-const userinfo = async (req,res)=>{
-
-}
 
 const getPublicToken = async (req,res)=>{
     const response = await authService.getPublicToken();
@@ -55,9 +62,14 @@ const login = async (req,res)=>{
 //     ApiResponse.ok(res,"Logout Successfull")
 // }
 
+const userinfo = async (req,res)=>{
+    const user = await authService.userinfo(req.user.id);
+    ApiResponse.ok(res,"User Profile",user);
+}
+
 const getMe = async (req,res)=>{
     const user = await authService.getMe(req.user.id);
     ApiResponse.ok(res,"User Profile",user);
 }
 
-export { register , login , getMe,   oidc , takeit , handleToken , userinfo , getPublicToken };
+export { register , login , getMe , oidc , takeit , handleToken , userinfo , getPublicToken , registerClient};

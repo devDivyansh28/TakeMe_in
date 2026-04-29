@@ -14,7 +14,7 @@ import { getPrivateKey } from "../../common/utils/jose.utils.js";
 
 
 
-import User from "./auth.model.js"
+import {User , Client} from "./auth.model.js"
 
 // import { sendVerificationEmail } from "../../common/config/email.js";
 
@@ -67,6 +67,26 @@ const login = async ({email , password})=>{
     
 }
 
+const registerClient = async ({project_Name , client_url , support_mail ,redirect_url , client_secret})=>{
+
+    const existing = await Client.findOne({project_Name});
+    if(existing) throw ApiError.conflict("Project Already Exists")
+
+    const client = await  Client.create({
+      project_Name,
+      client_url,
+      support_mail,
+      redirect_url,
+      client_secret,
+    });
+
+   const clientObj = client.toObject();
+
+    delete clientObj.client_secret;
+
+    return clientObj;
+}
+
 
 
 const oidcService = async ()=>{
@@ -89,9 +109,6 @@ const handleToken = async ()=>{
 
 }
 
-const userinfo = async ()=>{
-
-}
 
 const getPublicToken = async ()=>{
     
@@ -168,7 +185,7 @@ const getPublicToken = async ()=>{
 //     // TODO : mail bhejna Nhi aata
 // }
 
-const getMe = async (userId)=> {
+const userinfo = async (userId)=> {
    const user = await User.findById(userId);
    if(!user) throw ApiError.notFound("User not found");
    return user;
@@ -190,7 +207,7 @@ const getMe = async (userId)=> {
 // };
 
 
-export {register ,login ,getMe ,  oidcService , takeit , handleToken , userinfo , getPublicToken 
+export {register ,login  ,  oidcService , takeit , handleToken , userinfo , getPublicToken , registerClient
     // , login , refresh , logout , forgotPassword , getMe , verifyEmail
 }
 
