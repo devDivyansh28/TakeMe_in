@@ -1,262 +1,303 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Register - TakeMe In</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+      body {
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
 
+      .container {
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+        padding: 40px;
+        max-width: 450px;
+        width: 100%;
+      }
+
+      h1 {
+        color: #333;
+        margin-bottom: 30px;
+        text-align: center;
+        font-size: 2rem;
+      }
+
+      .form-group {
+        margin-bottom: 20px;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 8px;
+        color: #555;
+        font-weight: 600;
+        font-size: 0.95rem;
+      }
+
+      input,
+      select {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease;
+        font-family: inherit;
+      }
+
+      input:focus,
+      select:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+      }
+
+      .btn {
+        width: 100%;
+        padding: 12px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        margin-top: 10px;
+      }
+
+      .btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+      }
+
+      .alert {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        display: none;
+        align-items: center;
+        gap: 12px;
+        font-weight: 500;
+        font-size: 0.95rem;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        z-index: 1000;
+        max-width: 350px;
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes shake {
+        0%,
+        100% {
+          transform: translateX(0);
+        }
+        10%,
+        30%,
+        50%,
+        70%,
+        90% {
+          transform: translateX(-4px);
+        }
+        20%,
+        40%,
+        60%,
+        80% {
+          transform: translateX(4px);
+        }
+      }
+
+      .alert.error {
+        background: #fff1f0;
+        color: #d32f2f;
+        border-left: 4px solid #f5222d;
+        display: flex;
+        animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, shake 0.4s ease-in-out 0.4s;
+      }
+
+      .alert.success {
+        background: #f6ffed;
+        color: #388e3c;
+        border-left: 4px solid #52c41a;
+        display: flex;
+        animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+      }
+
+      .alert svg {
+        flex-shrink: 0;
+      }
+
+      .footer {
+        text-align: center;
+        margin-top: 20px;
+        color: #666;
+      }
+
+      .footer a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .footer a:hover {
+        text-decoration: underline;
+      }
+
+      .back-link {
+        display: inline-block;
+        margin-bottom: 20px;
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 600;
+      }
+
+      .back-link:hover {
+        text-decoration: underline;
+      }
+
+      @media (max-width: 600px) {
         .container {
-            background: white;
-            border-radius: 10px;
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-            padding: 40px;
-            max-width: 450px;
-            width: 100%;
+          padding: 30px 20px;
         }
 
         h1 {
-            color: #333;
-            margin-bottom: 30px;
-            text-align: center;
-            font-size: 2rem;
+          font-size: 1.5rem;
         }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        label {
-            display: block;
-            margin-bottom: 8px;
-            color: #555;
-            font-weight: 600;
-            font-size: 0.95rem;
-        }
-
-        input, select {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 1rem;
-            transition: border-color 0.3s ease;
-            font-family: inherit;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-        }
-
-        .btn {
-            width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-
-        .btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
-        }
-
-        .alert {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            border-radius: 8px;
-            display: none;
-            align-items: center;
-            gap: 12px;
-            font-weight: 500;
-            font-size: 0.95rem;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
-            z-index: 1000;
-            max-width: 350px;
-        }
-
-        @keyframes slideInRight {
-            from { opacity: 0; transform: translateX(50px); }
-            to { opacity: 1; transform: translateX(0); }
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
-            20%, 40%, 60%, 80% { transform: translateX(4px); }
-        }
-
-        .alert.error {
-            background: #fff1f0;
-            color: #d32f2f;
-            border-left: 4px solid #f5222d;
-            display: flex;
-            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, shake 0.4s ease-in-out 0.4s;
-        }
-
-        .alert.success {
-            background: #f6ffed;
-            color: #388e3c;
-            border-left: 4px solid #52c41a;
-            display: flex;
-            animation: slideInRight 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-        
-        .alert svg {
-            flex-shrink: 0;
-        }
-
-        .footer {
-            text-align: center;
-            margin-top: 20px;
-            color: #666;
-        }
-
-        .footer a {
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .footer a:hover {
-            text-decoration: underline;
-        }
-
-        .back-link {
-            display: inline-block;
-            margin-bottom: 20px;
-            color: #667eea;
-            text-decoration: none;
-            font-weight: 600;
-        }
-
-        .back-link:hover {
-            text-decoration: underline;
-        }
-
-        @media (max-width: 600px) {
-            .container {
-                padding: 30px 20px;
-            }
-
-            h1 {
-                font-size: 1.5rem;
-            }
-        }
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="container">
-        <a href="/takemein/takeit" class="back-link">← Back</a>
-        <h1>Create Account</h1>
+      <h1>Create Account</h1>
 
-        <div id="alert" class="alert"></div>
+      <div id="alert" class="alert"></div>
 
-        <form id="registerForm">
-            <div class="form-group">
-                <label for="name">Full Name</label>
-                <input type="text" id="name" name="name" placeholder="John Doe" required>
-            </div>
-
-            <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="email" id="email" name="email" placeholder="your@email.com" required>
-            </div>
-
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Create a strong password" required>
-            </div>
-
-            <div class="form-group">
-                <label for="role">Role</label>
-                <select id="role" name="role" required>
-                    <option value="">Select a role</option>
-                    <option value="user">User</option>
-                    <option value="admin">Admin</option>
-                    <option value="moderator">Moderator</option>
-                </select>
-            </div>
-
-            <button type="submit" class="btn">Register</button>
-        </form>
-
-        <div class="footer">
-            Already have an account? <a href="/takemein/login">Login here</a>
+      <form id="registerForm">
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input
+            type="text"
+            id="name"
+            name="name"
+            placeholder="John Doe"
+            required
+          />
         </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input
+            type="email"
+            id="email"
+            name="email"
+            placeholder="your@email.com"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            placeholder="Create a strong password"
+            required
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="role">Role</label>
+          <select id="role" name="role" required>
+            <option value="">Select a role</option>
+            <option value="user">User</option>
+            <option value="admin">Admin</option>
+            <option value="moderator">Moderator</option>
+          </select>
+        </div>
+
+        <button type="submit" class="btn">Register</button>
+      </form>
+
+      <div class="footer">
+        Already have an account? <a href="/takemein/login">Login here</a>
+      </div>
     </div>
 
     <script>
-        document.getElementById('registerForm').addEventListener('submit', async (e) => {
-            e.preventDefault();
+      document
+        .getElementById("registerForm")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
 
-            const name = document.getElementById('name').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const role = document.getElementById('role').value;
-            const alertDiv = document.getElementById('alert');
+          const name = document.getElementById("name").value;
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          const role = document.getElementById("role").value;
+          const alertDiv = document.getElementById("alert");
 
-            try {
-                const response = await fetch('/takemein/register', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ name, email, password, role }),
-                });
+          try {
+            const response = await fetch("/takemein/register", {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({ name, email, password, role }),
+            });
 
-                const data = await response.json();
+            const data = await response.json();
 
-                if (!response.ok) {
-                    throw new Error(data.message || 'Registration failed');
-                }
-
-                alertDiv.className = 'alert success';
-                alertDiv.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> <span>Registration successful! Redirecting to login...</span>`;
-                alertDiv.style.display = 'flex';
-
-                setTimeout(() => {
-                    window.location.href = '/takemein/login';
-                }, 1500);
-            } catch (error) {
-                alertDiv.className = 'alert error';
-                // Trigger reflow to restart animation
-                void alertDiv.offsetWidth;
-                alertDiv.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> <span>${error.message}</span>`;
-                alertDiv.style.display = 'flex';
-                
-                // Auto-hide error toast after 5 seconds
-                setTimeout(() => {
-                    if (alertDiv.className.includes('error')) {
-                        alertDiv.style.display = 'none';
-                    }
-                }, 5000);
+            if (!response.ok) {
+              throw new Error(data.message || "Registration failed");
             }
+
+            alertDiv.className = "alert success";
+            alertDiv.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg> <span>Registration successful! Redirecting to login...</span>`;
+            alertDiv.style.display = "flex";
+
+            setTimeout(() => {
+              window.location.href = "/takemein/login";
+            }, 1500);
+          } catch (error) {
+            alertDiv.className = "alert error";
+            // Trigger reflow to restart animation
+            void alertDiv.offsetWidth;
+            alertDiv.innerHTML = `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg> <span>${error.message}</span>`;
+            alertDiv.style.display = "flex";
+
+            // Auto-hide error toast after 5 seconds
+            setTimeout(() => {
+              if (alertDiv.className.includes("error")) {
+                alertDiv.style.display = "none";
+              }
+            }, 5000);
+          }
         });
     </script>
-</body>
+  </body>
 </html>

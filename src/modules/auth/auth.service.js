@@ -176,7 +176,7 @@ const getPublicToken = async ()=>{
 //    const user  = await User.findOne({email});
 //    if(!user) throw ApiError.notfound("No Account with that email")
 
-//     const {rawToken , hashedToken} = generateResetToken()
+//     // const {rawToken , hashedToken} = generateResetToken();
 //     user.resetPasswordToken = hashedToken;
 //     user.resestPasswordExpires = Date.now()+15 * 60 * 1000;
 

@@ -17,7 +17,15 @@ const router = Router();
 router.get('/health',(req,res)=>{
     return res.status(200).json({health : "ok"})
 })
+
+
+router.get("/takemein/register", (req, res) => {
+    return res.sendFile(process.cwd() + '/public/register.html');
+});
 router.post("/takemein/register", validate(RegisterDto), controller.register);
+router.get("/takemein/login", (req, res) => {
+    return res.sendFile(process.cwd() + '/public/login.html');
+});
 router.post("/takemein/login",validate(LoginDto) , controller.login)
 
 router.post('/takemein/registerclient',validate(ClientDto) , controller.registerClient);
@@ -35,7 +43,7 @@ router.post('/takemein/registerclient',validate(ClientDto) , controller.register
 
 router.get('/.well-known/openid-configuration', controller.oidc)
 
-router.get('/oidc/takeit',authenticateClient,controller.takeit)
+// router.get('/oidc/takeit',authenticateClient,controller.takeit)
 
 router.post('/oidc/token',controller.handleToken)
 
@@ -43,8 +51,12 @@ router.get('/oidc/userinfo', authenticate, controller.userinfo)
 
 router.get('/oidc/getPublicToken',controller.getPublicToken)
 
-router.get('/takemein/takeit', (req,res) => {
-    return res.sendFile(process.cwd() + '/public/dashboard.html');
+// router.get('/takemein/takeit', (req,res) => {
+//     return res.sendFile(process.cwd() + '/public/dashboard.html');
+// })
+
+router.get('/oidc/takeit',authenticateClient,(req,res)=>{
+    return res.sendFile(process.cwd() + "/public/dashboard.html");
 })
 
 
