@@ -61,7 +61,7 @@ const clientSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    client_url: {
+    client_uri: {
       type: String,
       required: true,
       lowercase: true,

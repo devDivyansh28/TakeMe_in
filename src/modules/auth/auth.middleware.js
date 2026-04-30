@@ -12,7 +12,8 @@ import { Client } from "./auth.model.js";
 const authenticate = async (req, res, next) => {
   try {
     // Bug 1 fixed — added !
-    const accesstoken = req.cookies?.accesstoken;
+    const accesstoken = req.cookies?.accesstoken
+
     if (!accesstoken) throw ApiError.unauthorized("Please Login to access this resource");
 
     // Bug 2 fixed — normal function call
@@ -49,7 +50,7 @@ const authenticateClient = async (req, res, next) => {
       throw ApiError.badRequest("Missing client_id or redirect_uri");
     }
 
-    const client = await Client.findById(client_id);
+    const client = await Client.findById(client_id).select("+client_secret");;
 
     if (!client) {
       throw ApiError.unauthorized("Client not allowed");

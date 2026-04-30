@@ -59,10 +59,14 @@ const login = async ({email , password , client_id , redirect_uri})=>{
     
     const isMatch = await user.comparePassword(password);
     if(!isMatch) throw ApiError.unauthorized("Invalid Email or password");
-     
+    
+    const redirection = await Client.findOne({redirect_uri});
+    if(!redirection) throw ApiError.unauthorized("Invalid request");
+
+    
     const code = crypto.randomBytes(32).toString('hex');
 
-
+  
     await AuthCode.create({
         code,
         user_id : user._id,
@@ -72,7 +76,7 @@ const login = async ({email , password , client_id , redirect_uri})=>{
         used : false
      });
 
-     return code;
+     return {code , redirection};
     // const token = await new SignJWT({
     //   sub: user._id.toString(),
     //   email: user.email,
@@ -112,12 +116,12 @@ const registerClient = async ({project_Name , client_url , support_mail ,redirec
 
 const oidcService = async ()=>{
     const services = {
-        issuer : "http://localhost:4000",
-        authorization_endpoint : "http://localhost:4000/oidc/takeit",
-        token_endpoint : "http://localhost:4000/oidc/token",
-        userinfo_endpoint : "http://localhost:4000/oidc/userinfo",
-        jwks_uri:"http://localhost:4000/oidc/getPublicToken"
-    }
+      issuer: `${process.env.BASE_URL}`,
+      authorization_endpoint: `${process.env.BASE_URL}/oidc/takeit`,
+      token_endpoint: `${process.env.BASE_URL}/oidc/token`,
+      userinfo_endpoint: `${process.env.BASE_URL}/oidc/userinfo`,
+      jwks_uri: `${process.env.BASE_URL}/oidc/getPublicToken`,
+    };
 
     return services;
 }
@@ -128,33 +132,46 @@ const takeit = async () =>{
 
 
 const handleToken = async ({code , client_id , client_secret})=>{
-   // We will first verify the credential of the client
-   const client = await Client.findOne({client_id , client_secret});
-   if(!client) return ApiError.unauthorized("Invalid Request");
+  // We will first verify the credential of the client
+  const client = await Client.findById(client_id);
+  if (!client) throw ApiError.unauthorized("Invalid Request");
 
-   const authCode = await AuthCode.findOne({code , client_id});
-   if(!authCode) return ApiError.unauthorized("Invalid Code");
-   if(authCode.used) return ApiError.unauthorized("Code already used")
-   if(authCode.expires_at < new Date()) return ApiError.unauthorized('Code expired')
+  const isValidClient = await client.comparePassword(client_secret);
+  if (!isValidClient) throw ApiError.unauthorized("Invalid Request");
 
-   const user = await User.findById(authCode.user_id);
+  const authCode = await AuthCode.findOne({ code, client_id });
 
-   await AuthCode.updateOne({code},{used : true});
+  if (!authCode) throw ApiError.unauthorized("Invalid Code");
 
-   const access_token = await SignJWT({
-    sub : user._id.toString(),
-    email : user.email,
-    given_name : user.name,
-    role : user.role,
-    client_id
-   })
-     .setProtectedHeader({ alg: 'RS256', kid: 'key_v1' })
+  if (authCode.used) {
+     await AuthCode.deleteOne({ _id: authCode._id });
+     throw ApiError.unauthorized("Code already used");
+  }
+
+  if (authCode.expires_at < new Date()){
+     await AuthCode.deleteOne({ _id: authCode._id });
+     throw ApiError.unauthorized("Code expired");
+  }
+
+  const user = await User.findById(authCode.user_id);
+
+  await AuthCode.updateOne({ code }, { used: true });
+
+  const access_token = await SignJWT({
+    sub: user._id.toString(),
+    email: user.email,
+    given_name: user.name,
+    role: user.role,
+    client_id,
+  })
+    .setProtectedHeader({ alg: "RS256", kid: "key_v1" })
     .setIssuedAt()
-    .setExpirationTime('24h')
+    .setExpirationTime("24h")
     .sign(await getPrivateKey());
 
-    return access_token;
+  await await AuthCode.deleteOne({ _id: authCode._id }); 
 
+  return access_token;
 }
 
 

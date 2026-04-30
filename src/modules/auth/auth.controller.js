@@ -59,7 +59,7 @@ const getPublicToken = async (req,res)=>{
 const login = async (req,res)=>{
     const {email , password}= req.body;
     const {client_id , redirect_uri} = req.session
-    const code = await authService.login({email , password , client_id , redirect_uri});
+    const {code , redirectTo} = await authService.login({email , password , client_id , redirect_uri});
 
     // res.cookie("accesstoken",token,{
     //     httpOnly: true,
@@ -67,7 +67,7 @@ const login = async (req,res)=>{
     //     maxAge : 7*24*60*60*1000,
     // });
 
-    res.redirect(`${redirect_uri}?code=${code}`);
+    res.redirect(`${redirectTo}?code=${code}`);
 }
 
 // const logout = async (req,res)=>{

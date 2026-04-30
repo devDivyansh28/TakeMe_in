@@ -2,7 +2,7 @@
 class ApiResponse {
   static ok(res, message, data = null) {
     return res.status(200).json({
-      sucess: true,
+      success: true,
       message,
       data,
     });
@@ -10,7 +10,7 @@ class ApiResponse {
 
   static created(res, message, data = null) {
     return res.status(201).json({
-      sucess: true,
+      success: true,
       message,
       data,
     });
