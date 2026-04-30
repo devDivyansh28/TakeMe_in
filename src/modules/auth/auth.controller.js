@@ -14,6 +14,7 @@ const register = async (req, res) => {
   );
 };
 
+
 const registerClient = async (req , res)=>{
   const client = await authService.registerClient(req.body);
 
@@ -31,12 +32,22 @@ const oidc = async (req,res)=> {
   return res.status(200).json(response);
 }
 
+
 const takeit = async (req,res)=>{
     return res.sendFile(process.cwd() + '/public/dashboard.html');
 }
 
-const handleToken = async (req,res)=>{
 
+const handleToken = async (req,res)=>{
+    const {code , client_id , client_secret} = req.body;
+
+    const access_token = await authService.handleToken({code , client_id , client_secret});
+
+    return res.json({
+      access_token,
+      token_type : 'Bearer',
+      expires_in : 86400
+    })
 }
 
 
@@ -44,16 +55,19 @@ const getPublicToken = async (req,res)=>{
     const response = await authService.getPublicToken();
     return res.status(200).json(response);
 }
+
 const login = async (req,res)=>{
+    const {email , password}= req.body;
+    const {client_id , redirect_uri} = req.session
+    const code = await authService.login({email , password , client_id , redirect_uri});
 
-    const {token} = await authService.login(req.body)
-    res.cookie("accesstoken",token,{
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        maxAge : 7*24*60*60*1000,
-    });
+    // res.cookie("accesstoken",token,{
+    //     httpOnly: true,
+    //     secure: process.env.NODE_ENV === 'production',
+    //     maxAge : 7*24*60*60*1000,
+    // });
 
-    ApiResponse.ok(res,"Login successfull");
+    res.redirect(`${redirect_uri}?code=${code}`);
 }
 
 // const logout = async (req,res)=>{
@@ -62,14 +76,18 @@ const login = async (req,res)=>{
 //     ApiResponse.ok(res,"Logout Successfull")
 // }
 
+
+
 const userinfo = async (req,res)=>{
     const user = await authService.userinfo(req.user.id);
     ApiResponse.ok(res,"User Profile",user);
 }
 
-const getMe = async (req,res)=>{
-    const user = await authService.getMe(req.user.id);
-    ApiResponse.ok(res,"User Profile",user);
-}
 
-export { register , login , getMe , oidc , takeit , handleToken , userinfo , getPublicToken , registerClient};
+
+// const getMe = async (req,res)=>{
+//     const user = await authService.getMe(req.user.id);
+//     ApiResponse.ok(res,"User Profile",user);
+// }
+
+export { register , login , oidc , takeit , handleToken , userinfo , getPublicToken , registerClient };

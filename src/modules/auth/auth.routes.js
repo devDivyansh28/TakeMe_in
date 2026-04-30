@@ -22,11 +22,17 @@ router.get('/health',(req,res)=>{
 router.get("/takemein/register", (req, res) => {
     return res.sendFile(process.cwd() + '/public/register.html');
 });
-router.post("/takemein/register", validate(RegisterDto), controller.register);
+
 router.get("/takemein/login", (req, res) => {
     return res.sendFile(process.cwd() + '/public/login.html');
 });
-router.post("/takemein/login",validate(LoginDto) , controller.login)
+
+router.get('/oidc/takeit',authenticateClient,controller.takeit);
+
+router.post("/takemein/oidc/register", validate(RegisterDto), controller.register);
+
+router.post("/takemein/oidc/login",validate(LoginDto) , controller.login)
+
 
 router.post('/takemein/registerclient',validate(ClientDto) , controller.registerClient);
 // router.get("/takemein/me", authenticate, controller.getMe)
@@ -55,9 +61,6 @@ router.get('/oidc/getPublicToken',controller.getPublicToken)
 //     return res.sendFile(process.cwd() + '/public/dashboard.html');
 // })
 
-router.get('/oidc/takeit',authenticateClient,(req,res)=>{
-    return res.sendFile(process.cwd() + "/public/dashboard.html");
-})
 
 
 export default router;

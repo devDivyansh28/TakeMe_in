@@ -13,7 +13,7 @@ const authenticate = async (req, res, next) => {
   try {
     // Bug 1 fixed — added !
     const accesstoken = req.cookies?.accesstoken;
-    if (!accesstoken) throw ApiError.unauthorized("No token provided");
+    if (!accesstoken) throw ApiError.unauthorized("Please Login to access this resource");
 
     // Bug 2 fixed — normal function call
     const { payload } = await jwtVerify(accesstoken, await getPublicKey(), {
@@ -31,10 +31,10 @@ const authenticate = async (req, res, next) => {
     next();
   } catch (error) {
     if (error.code === "ERR_JWT_EXPIRED") {
-      return next(ApiError.unauthorized("Token has expired"));
+      throw ApiError.unauthorized("Token Expired, Please Login Again");
     }
     if (error.code === "ERR_JWS_INVALID") {
-      return next(ApiError.unauthorized("Invalid Token"));
+      throw ApiError.unauthorized("Invalid Token, Please Login Again");
     }
     return next(error);
   }
@@ -42,6 +42,7 @@ const authenticate = async (req, res, next) => {
 
 const authenticateClient = async (req, res, next) => {
   try {
+    
     const { client_id, redirect_uri } = req.query;
 
     if (!client_id || !redirect_uri) {
@@ -58,7 +59,8 @@ const authenticateClient = async (req, res, next) => {
       throw ApiError.unauthorized("Invalid redirect URI");
     }
 
-    req.client = client;
+    req.session.client_id = client_id;
+    req.session.redirect_uri = redirect_uri;
 
     next();
   } catch (error) {

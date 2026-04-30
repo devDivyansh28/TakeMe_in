@@ -6,7 +6,8 @@ import { getPublicKey } from "../../common/utils/jose.utils.js";
 
 import { getPrivateKey } from "../../common/utils/jose.utils.js";
 
-// import { generateVerificationToken 
+import crypto from "node:crypto"
+
 //     // , generateAccessToken ,
 //     //  generateRefreshToken , verifyAcessToken , verifyRefreshToken , hashToken
 //     } from "../../common/utils/jwt.utils.js";
@@ -14,7 +15,8 @@ import { getPrivateKey } from "../../common/utils/jose.utils.js";
 
 
 
-import {User , Client} from "./auth.model.js"
+import {User , Client ,AuthCode} from "./auth.model.js"
+
 
 // import { sendVerificationEmail } from "../../common/config/email.js";
 
@@ -45,25 +47,44 @@ const register = async ({name,email,password,role})=>{
     return userObj
 }
 
-const login = async ({email , password})=>{
+
+const login = async ({email , password , client_id , redirect_uri})=>{
+    
+    if(!client_id || !redirect_uri) {
+        throw ApiError.unauthorized("Session Expired");
+    }
+
     const user = await User.findOne({email}).select('+password');
     if(!user) throw ApiError.unauthorized("Invalid Email Address");
-
+    
     const isMatch = await user.comparePassword(password);
     if(!isMatch) throw ApiError.unauthorized("Invalid Email or password");
+     
+    const code = crypto.randomBytes(32).toString('hex');
 
-    const token = await new SignJWT({
-      sub: user._id.toString(),
-      email: user.email,
-      given_name : user.name,
-      role : user.role
-    })
-      .setProtectedHeader({ alg: "RS256", kid: "key_v1" })
-      .setIssuedAt() 
-      .setExpirationTime("24h")
-      .sign(await getPrivateKey());
 
-    return {token};
+    await AuthCode.create({
+        code,
+        user_id : user._id,
+        client_id,
+        redirect_uri,
+        expires_at: new Date(Date.now() + 5*60 * 1000),
+        used : false
+     });
+
+     return code;
+    // const token = await new SignJWT({
+    //   sub: user._id.toString(),
+    //   email: user.email,
+    //   given_name : user.name,
+    //   role : user.role
+    // })
+    //   .setProtectedHeader({ alg: "RS256", kid: "key_v1" })
+    //   .setIssuedAt() 
+    //   .setExpirationTime("24h")
+    //   .sign(await getPrivateKey());
+
+    // return {token};
     
 }
 
@@ -105,7 +126,34 @@ const takeit = async () =>{
 
 }
 
-const handleToken = async ()=>{
+
+const handleToken = async ({code , client_id , client_secret})=>{
+   // We will first verify the credential of the client
+   const client = await Client.findOne({client_id , client_secret});
+   if(!client) return ApiError.unauthorized("Invalid Request");
+
+   const authCode = await AuthCode.findOne({code , client_id});
+   if(!authCode) return ApiError.unauthorized("Invalid Code");
+   if(authCode.used) return ApiError.unauthorized("Code already used")
+   if(authCode.expires_at < new Date()) return ApiError.unauthorized('Code expired')
+
+   const user = await User.findById(authCode.user_id);
+
+   await AuthCode.updateOne({code},{used : true});
+
+   const access_token = await SignJWT({
+    sub : user._id.toString(),
+    email : user.email,
+    given_name : user.name,
+    role : user.role,
+    client_id
+   })
+     .setProtectedHeader({ alg: 'RS256', kid: 'key_v1' })
+    .setIssuedAt()
+    .setExpirationTime('24h')
+    .sign(await getPrivateKey());
+
+    return access_token;
 
 }
 
@@ -207,7 +255,7 @@ const userinfo = async (userId)=> {
 // };
 
 
-export {register ,login  ,  oidcService , takeit , handleToken , userinfo , getPublicToken , registerClient
+export {register ,login  ,  oidcService , takeit , handleToken , userinfo , getPublicToken , registerClient 
     // , login , refresh , logout , forgotPassword , getMe , verifyEmail
 }
 
