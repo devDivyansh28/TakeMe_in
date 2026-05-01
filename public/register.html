@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TakeMe In - Authentication</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --bg-gradient-1: #3b82f6;
+            --bg-gradient-2: #8b5cf6;
+            --text-main: #ffffff;
+            --text-muted: #9ca3af;
+            --glass-bg: rgba(17, 24, 39, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            --error: #ef4444;
+            --success: #10b981;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, var(--bg-gradient-1), var(--bg-gradient-2));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+            overflow: hidden;
+            color: var(--text-main);
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Abstract Background Shapes */
+        .shape {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            opacity: 0.6;
+        }
+        .shape-1 {
+            width: 400px;
+            height: 400px;
+            background: #ec4899;
+            top: -100px;
+            left: -100px;
+            animation: float 8s ease-in-out infinite;
+        }
+        .shape-2 {
+            width: 500px;
+            height: 500px;
+            background: #06b6d4;
+            bottom: -150px;
+            right: -100px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-30px) scale(1.05); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            width: 100%;
+            max-width: 480px;
+            padding: 2rem;
+            perspective: 1000px;
+        }
+
+        .glass-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 3rem 2.5rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #fff, #cbd5e1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 0.5rem;
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Toggle Switch */
+        .toggle-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            padding: 0.35rem;
+            display: flex;
+            position: relative;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 0.75rem 0;
+            border: none;
+            background: transparent;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            z-index: 2;
+            transition: color 0.3s ease;
+        }
+
+        .toggle-btn.active {
+            color: #fff;
+        }
+
+        .toggle-slider {
+            position: absolute;
+            top: 0.35rem;
+            left: 0.35rem;
+            width: calc(50% - 0.35rem);
+            height: calc(100% - 0.7rem);
+            background: var(--primary);
+            border-radius: 8px;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        /* Forms */
+        .forms-wrapper {
+            position: relative;
+            min-height: 280px; /* Adjust based on content */
+        }
+
+        .form-section {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateX(20px);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .form-section.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(0);
+            position: relative;
+        }
+
+        .form-section.exit {
+            transform: translateX(-20px);
+            opacity: 0;
+            visibility: hidden;
+            position: absolute;
+        }
+
+        .input-group {
+            margin-bottom: 1.25rem;
+            position: relative;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: #d1d5db;
+            transition: color 0.3s ease;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .input-group input:focus {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+        }
+
+        .input-group input:focus + label {
+            color: var(--primary);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-submit:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.3);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+        }
+
+        .btn-submit.loading {
+            color: transparent;
+            pointer-events: none;
+        }
+
+        .btn-submit.loading::after {
+            content: "";
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            top: calc(50% - 10px);
+            left: calc(50% - 10px);
+            border: 2px solid white;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Toast Notifications */
+        .toast-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            pointer-events: none;
+        }
+
+        .toast {
+            background: rgba(17, 24, 39, 0.95);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.5);
+            transform: translateX(120%);
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            pointer-events: auto;
+            max-width: 350px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+            opacity: 1;
+        }
+
+        .toast.hide {
+            transform: translateX(120%);
+            opacity: 0;
+        }
+
+        .toast-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .toast.error .toast-icon {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--error);
+        }
+
+        .toast.success .toast-icon {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--success);
+        }
+
+        .toast-content {
+            flex: 1;
+        }
+
+        .toast-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-bottom: 0.15rem;
+        }
+
+        .toast-message {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            line-height: 1.4;
+        }
+
+        .toast-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 4px;
+            transition: color 0.2s;
+            display: flex;
+        }
+
+        .toast-close:hover {
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+
+    <div class="container">
+        <div class="glass-card">
+            <div class="header">
+                <h1 class="logo">TakeMe In</h1>
+                <p class="subtitle">Securely access your workspace</p>
+            </div>
+
+            <div class="toggle-container">
+                <div class="toggle-slider" id="toggleSlider"></div>
+                <button class="toggle-btn active" id="btnLoginToggle" onclick="switchTab('login')">Login</button>
+                <button class="toggle-btn" id="btnRegisterToggle" onclick="switchTab('register')">Register</button>
+            </div>
+
+            <div class="forms-wrapper">
+                <!-- Login Form -->
+                <form id="loginForm" class="form-section active" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <input type="email" id="loginEmail" required placeholder="name@example.com">
+                        <label for="loginEmail">Email Address</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="loginPassword" required placeholder="••••••••">
+                        <label for="loginPassword">Password</label>
+                    </div>
+                    <button type="submit" class="btn-submit" id="loginSubmitBtn">Sign In</button>
+                </form>
+
+                <!-- Register Form -->
+                <form id="registerForm" class="form-section" onsubmit="handleRegister(event)">
+                    <div class="input-group">
+                        <input type="text" id="registerName" required placeholder="John Doe">
+                        <label for="registerName">Full Name</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="email" id="registerEmail" required placeholder="name@example.com">
+                        <label for="registerEmail">Email Address</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="password" id="registerPassword" required placeholder="••••••••">
+                        <label for="registerPassword">Password</label>
+                    </div>
+                    <button type="submit" class="btn-submit" id="registerSubmitBtn">Create Account</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        // Tab Switching Logic
+        function switchTab(tab) {
+            const loginForm = document.getElementById('loginForm');
+            const registerForm = document.getElementById('registerForm');
+            const slider = document.getElementById('toggleSlider');
+            const btnLogin = document.getElementById('btnLoginToggle');
+            const btnRegister = document.getElementById('btnRegisterToggle');
+
+            if (tab === 'login') {
+                slider.style.transform = 'translateX(0)';
+                btnLogin.classList.add('active');
+                btnRegister.classList.remove('active');
+                
+                registerForm.classList.remove('active');
+                registerForm.classList.add('exit');
+                
+                setTimeout(() => {
+                    loginForm.classList.remove('exit');
+                    loginForm.classList.add('active');
+                }, 50);
+                
+            } else {
+                slider.style.transform = 'translateX(100%)';
+                btnRegister.classList.add('active');
+                btnLogin.classList.remove('active');
+                
+                loginForm.classList.remove('active');
+                loginForm.classList.add('exit');
+                
+                setTimeout(() => {
+                    registerForm.classList.remove('exit');
+                    registerForm.classList.add('active');
+                }, 50);
+            }
+        }
+
+        // Toast Notification System
+        function showToast(title, message, type = 'error') {
+            const container = document.getElementById('toastContainer');
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+            
+            const iconSvg = type === 'error' 
+                ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="15" y1="9" x2="9" y2="15"></line><line x1="9" y1="9" x2="15" y2="15"></line></svg>`
+                : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>`;
+
+            toast.innerHTML = `
+                <div class="toast-icon">
+                    ${iconSvg}
+                </div>
+                <div class="toast-content">
+                    <div class="toast-title">${title}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="this.parentElement.remove()">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                </button>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            setTimeout(() => toast.classList.add('show'), 10);
+
+            // Auto dismiss
+            setTimeout(() => {
+                toast.classList.remove('show');
+                toast.classList.add('hide');
+                setTimeout(() => toast.remove(), 400);
+            }, 5000);
+        }
+
+        // Handle Login Submission
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginSubmitBtn');
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+
+            try {
+                btn.classList.add('loading');
+                
+                const response = await fetch('/takemein/oidc/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+
+                if (response.redirected) {
+                    window.location.href = response.url;
+                    return;
+                }
+
+                if (!response.ok) {
+                    const data = await response.json().catch(() => ({}));
+                    throw new Error(data.message || 'Invalid email or password');
+                }
+
+                const data = await response.json();
+                showToast('Success', 'Login successful', 'success');
+                
+                if (data.redirectUrl) {
+                    window.location.href = data.redirectUrl;
+                }
+
+            } catch (err) {
+                showToast('Login Failed', err.message, 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+
+        // Handle Register Submission
+        async function handleRegister(e) {
+            e.preventDefault();
+            const btn = document.getElementById('registerSubmitBtn');
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+
+            try {
+                btn.classList.add('loading');
+                
+                const response = await fetch('/takemein/oidc/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, email, password, role: 'user' })
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Registration failed. Please check your details.');
+                }
+
+                showToast('Success', data.message || 'Registration successful. You can now log in.', 'success');
+                
+                // Clear form and switch to login
+                e.target.reset();
+                setTimeout(() => switchTab('login'), 1500);
+
+            } catch (err) {
+                showToast('Registration Failed', err.message, 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            switchTab('register');
+        });
+    </script>
+</body>
+</html>

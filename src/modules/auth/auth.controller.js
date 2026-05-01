@@ -3,6 +3,7 @@ import * as authService from "./auth.service.js";
 import ApiResponse from "../../common/utils/api_response.js";
 
 import Joi from "joi";
+import ApiError from "../../common/utils/api_error.js";
 
 const register = async (req, res) => {
   const user = await authService.register(req.body);
@@ -58,7 +59,9 @@ const getPublicToken = async (req,res)=>{
 
 const login = async (req,res)=>{
     const {email , password}= req.body;
-    const {client_id , redirect_uri} = req.session
+    if(!req.session) throw ApiError.unauthorized("Session is missing")
+    const client_id = req.session.client_id;
+    const redirect_uri = req.session.redirect_uri;
     const {code , redirectTo} = await authService.login({email , password , client_id , redirect_uri});
 
     // res.cookie("accesstoken",token,{

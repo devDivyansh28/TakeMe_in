@@ -50,13 +50,13 @@ const authenticateClient = async (req, res, next) => {
       throw ApiError.badRequest("Missing client_id or redirect_uri");
     }
 
-    const client = await Client.findById(client_id).select("+client_secret");;
+    const client = await Client.findById(client_id).select("+client_secret");
 
     if (!client) {
       throw ApiError.unauthorized("Client not allowed");
     }
 
-    if (redirect_uri !== client.redirect_url) {
+    if (redirect_uri !== client.redirect_uri) {
       throw ApiError.unauthorized("Invalid redirect URI");
     }
 
@@ -64,6 +64,7 @@ const authenticateClient = async (req, res, next) => {
     req.session.redirect_uri = redirect_uri;
 
     next();
+    
   } catch (error) {
     next(error); 
   }

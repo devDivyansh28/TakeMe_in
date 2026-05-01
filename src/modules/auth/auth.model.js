@@ -74,7 +74,7 @@ const clientSchema = new mongoose.Schema(
       lowercase: true,
       trim: true,
     },
-    redirect_url: {
+    redirect_uri: {
       type: String,
       required: true,
       unique: true,
