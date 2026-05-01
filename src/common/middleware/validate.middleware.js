@@ -4,9 +4,9 @@ const validate = (Dtoclass) => {
   return (req, res, next) => {
     const { errors, value } = Dtoclass.validate(req.body);
     if (errors) {
-      throw ApiError.badRequest(errors.join(" "));
+      throw ApiError.badRequest(errors.join("\n"));
     }
-    req.body = value; //***This is most imp step if you do not pass validated data next then what is the meaning of validation😀😀 This is the sanitized data from joi */
+    req.body = value; 
     next();
   };
 };

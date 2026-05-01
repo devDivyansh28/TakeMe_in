@@ -62,10 +62,7 @@ const authenticateClient = async (req, res, next) => {
 
     req.session.client_id = client_id;
     req.session.redirect_uri = redirect_uri;
-    // req.client = {
-    //   client_name : client.client_name,
-    //   app_name : client.app_name
-    // }
+    
 
     next();
     

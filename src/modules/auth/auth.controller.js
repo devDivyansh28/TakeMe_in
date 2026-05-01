@@ -68,22 +68,9 @@ const login = async (req,res)=>{
     
     const {code , redirectTo} = await authService.login({email , password , client_id , redirect_uri});
 
-    // res.cookie("accesstoken",token,{
-    //     httpOnly: true,
-    //     secure: process.env.NODE_ENV === 'production',
-    //     maxAge : 7*24*60*60*1000,
-    // });
 
     res.redirect(`${redirectTo}?code=${code}`);
 }
-
-// const logout = async (req,res)=>{
-//     await authService.logout(req.user.id)
-//     res.clearCookie("refreshToken");
-//     ApiResponse.ok(res,"Logout Successfull")
-// }
-
-
 
 const userinfo = async (req,res)=>{
     const user = await authService.userinfo(req.user.id);
@@ -95,9 +82,6 @@ const clientProfile = async (req,res)=>{
   ApiResponse.ok(res,"Client Profile",client);
 }
 
-// const getMe = async (req,res)=>{
-//     const user = await authService.getMe(req.user.id);
-//     ApiResponse.ok(res,"User Profile",user);
-// }
+
 
 export { register , login , oidc , takeit , handleToken , userinfo , getPublicToken , registerClient , clientProfile };

@@ -5,7 +5,7 @@ import { fileURLToPath } from "url";
 import session from "express-session"
 import "dotenv/config"
 
-const app = express(); // This file is important if in future we want to shift from express to fastify,bun,elysia,hono
+const app = express(); 
 
 import router from "./modules/auth/auth.routes.js";
 import ApiError from "./common/utils/api_error.js";
@@ -36,6 +36,16 @@ app.use('/',router);
 
 app.all("{*path}", (req, res) => {
   throw ApiError.notFound(`Route ${req.originalUrl} not found`);
+});
+
+
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(statusCode).json({
+    success: false,
+    message,
+  });
 });
 
 export default app;

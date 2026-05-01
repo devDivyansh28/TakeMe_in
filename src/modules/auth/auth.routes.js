@@ -37,21 +37,14 @@ router.post("/takemein/oidc/login",validate(LoginDto) , controller.login)
 
 router.post('/takemein/registerclient',validate(ClientDto) , controller.registerClient);
 router.post('/takemein/clients/profile',validate(ClientLoginDto) , controller.clientProfile)
-// router.get("/takemein/me", authenticate, controller.getMe)
 
-// router.post("/login",validate(LoginDto),controller.login)
-
-// router.post("/logout",authenticate,controller.logout)
-
-// router.post("/getMe",authenticate,controller.getMe)
-// // router.get("/verify-email/:token",controller.getMe);
 
 
 
 
 router.get('/.well-known/openid-configuration', controller.oidc)
 
-// router.get('/oidc/takeit',authenticateClient,controller.takeit)
+
 
 router.post('/oidc/token',controller.handleToken)
 
@@ -59,9 +52,6 @@ router.get('/oidc/userinfo', authenticate, controller.userinfo)
 
 router.get('/oidc/getPublicToken',controller.getPublicToken)
 
-// router.get('/takemein/takeit', (req,res) => {
-//     return res.sendFile(process.cwd() + '/public/dashboard.html');
-// })
 
 
 

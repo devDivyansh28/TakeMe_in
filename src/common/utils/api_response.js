@@ -20,7 +20,6 @@ class ApiResponse {
     return res.status(204).send();
   }
 
-  // This is not limited to these object's we will add more in future...
 }
 
 export default ApiResponse;

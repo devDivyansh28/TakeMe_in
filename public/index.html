@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TakeMe In - Authentication</title>
+    <title>TakeMe In - Authentication Provider</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -41,7 +41,7 @@
         /* Japanese Typography Utility */
         .jp-text {
             font-family: 'Noto Sans JP', sans-serif;
-            font-size: 0.9em; /* 10% smaller rule */
+            font-size: 0.9em;
             line-height: 1.6;
             opacity: 0.6;
             font-weight: 300;
@@ -84,18 +84,18 @@
             z-index: 10;
             width: 90%;
             max-width: 1100px;
-            height: 75vh;
-            min-height: 600px;
+            height: 80vh;
+            min-height: 650px;
             background: var(--glass-bg);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             border: 1px solid var(--glass-border);
-            border-radius: 2px; /* Extremely minimal radius */
+            border-radius: 2px;
             display: flex;
             box-shadow: 0 30px 60px rgba(26, 26, 26, 0.8);
         }
 
-        /* Left Side: Utility Pane (Kanso/Clutter-free) */
+        /* Left Side: Utility Pane */
         .utility-pane {
             flex: 0 0 420px;
             padding: 4rem 3.5rem;
@@ -103,6 +103,15 @@
             flex-direction: column;
             background: rgba(26, 26, 26, 0.4);
             position: relative;
+            overflow-y: auto; /* Enable scroll for long forms */
+        }
+
+        .utility-pane::-webkit-scrollbar {
+            width: 4px;
+        }
+        .utility-pane::-webkit-scrollbar-thumb {
+            background: var(--torii-red);
+            border-radius: 4px;
         }
 
         /* Right Side: Immersive High-Art Nature */
@@ -116,7 +125,6 @@
         .nature-image {
             position: absolute;
             inset: 0;
-            /* High-art abstract zen stone / water image */
             background: url('https://images.unsplash.com/photo-1528360983277-13d401cdc186?q=80&w=2070&auto=format&fit=crop') center/cover;
             filter: grayscale(85%) contrast(120%) brightness(30%);
             transition: filter 2.5s cubic-bezier(0.16, 1, 0.3, 1), transform 15s ease-out;
@@ -130,7 +138,7 @@
 
         /* Header Aesthetics */
         .header {
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
         }
 
         .logo {
@@ -162,8 +170,8 @@
         /* Bento Toggle Tabs */
         .toggle-container {
             display: flex;
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+            gap: 1rem;
+            margin-bottom: 2rem;
         }
 
         .toggle-btn {
@@ -172,7 +180,7 @@
             background: transparent;
             border: none;
             color: var(--fuji-white);
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 400;
             letter-spacing: 0.1em;
             text-transform: uppercase;
@@ -180,7 +188,7 @@
             opacity: 0.4;
             transition: opacity 0.4s ease;
             position: relative;
-            text-align: left;
+            text-align: center;
         }
 
         .toggle-btn.active {
@@ -233,15 +241,34 @@
             position: absolute;
         }
 
-        /* Input Styling (Minimalist Materiality) */
+        /* About Section Text */
+        .about-content {
+            font-size: 0.9rem;
+            font-weight: 300;
+            color: var(--fuji-white);
+            opacity: 0.8;
+            line-height: 1.8;
+            text-align: justify;
+        }
+
+        .about-content p {
+            margin-bottom: 1rem;
+        }
+
+        .about-content .highlight {
+            color: var(--torii-red);
+            font-weight: 400;
+        }
+
+        /* Input Styling */
         .input-group {
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             position: relative;
         }
 
         .input-group label {
             display: block;
-            margin-bottom: 0.5rem;
+            margin-bottom: 0.4rem;
             font-size: 0.7rem;
             font-weight: 500;
             letter-spacing: 0.15em;
@@ -256,9 +283,9 @@
             background: transparent;
             border: none;
             border-bottom: 1px solid rgba(234, 234, 234, 0.15);
-            padding: 0.5rem 0;
+            padding: 0.4rem 0;
             color: var(--fuji-white);
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-family: 'Inter', monospace;
             transition: border-color 0.4s ease;
             outline: none;
@@ -290,7 +317,8 @@
             text-transform: uppercase;
             cursor: pointer;
             transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            margin-top: 1.5rem;
+            margin-top: 1rem;
+            margin-bottom: 1rem;
             position: relative;
             overflow: hidden;
         }
@@ -298,7 +326,7 @@
         .btn-submit:hover {
             border-color: var(--torii-red);
             color: var(--torii-red);
-            box-shadow: 0 0 20px rgba(186, 71, 49, 0.15); /* Quiet glow */
+            box-shadow: 0 0 20px rgba(186, 71, 49, 0.15);
             background: rgba(186, 71, 49, 0.05);
         }
 
@@ -324,7 +352,43 @@
             to { transform: rotate(360deg); }
         }
 
-        /* Toast Notifications (Minimalist) */
+        /* Client Info Display */
+        .info-card {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--glass-border);
+            padding: 1.5rem;
+            border-radius: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .info-row {
+            margin-bottom: 1rem;
+        }
+
+        .info-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .info-label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            opacity: 0.5;
+            margin-bottom: 0.3rem;
+        }
+
+        .info-value {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--fuji-white);
+            word-break: break-all;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0.5rem;
+            border-radius: 2px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Toast Notifications */
         .toast-container {
             position: fixed;
             bottom: 30px;
@@ -373,7 +437,7 @@
         }
 
         .toast.error .toast-icon { color: var(--torii-red); }
-        .toast.success .toast-icon { color: var(--success); }
+        .toast.success .toast-icon { color: #4CAF50; }
 
         .toast-content { flex: 1; }
 
@@ -413,7 +477,7 @@
                 min-height: 85vh;
             }
             .nature-pane {
-                display: none; /* Emphasize Kanso on small screens */
+                display: none;
             }
             .utility-pane {
                 flex: 1;
@@ -434,53 +498,93 @@
             <div class="header">
                 <h1 class="logo">
                     TakeMe In<span class="logo-dot">.</span>
-                    <span class="jp-text">入り口</span>
+                    <span class="jp-text">認証</span>
                 </h1>
                 <p class="subtitle">
-                    Secure workspace
-                    <span class="jp-text">安全なアクセス</span>
+                    Identity Provider
+                    <span class="jp-text">アイデンティティ</span>
                 </p>
             </div>
 
             <div class="toggle-container">
-                <button class="toggle-btn active" id="btnLoginToggle" onclick="switchTab('login')">Login <span class="jp-text">ログイン</span></button>
-                <button class="toggle-btn" id="btnRegisterToggle" onclick="switchTab('register')">Register <span class="jp-text">登録</span></button>
+                <button class="toggle-btn active" id="btnAboutToggle" onclick="switchTab('about')">About</button>
+                <button class="toggle-btn" id="btnRegisterToggle" onclick="switchTab('register')">Register App</button>
+                <button class="toggle-btn" id="btnDashboardToggle" onclick="switchTab('dashboard')">Client Login</button>
             </div>
 
             <div class="forms-wrapper">
-                <!-- Login Form -->
-                <form id="loginForm" class="form-section active" onsubmit="handleLogin(event)">
-                    <div class="input-group">
-                        <input type="email" id="loginEmail" required placeholder="name@example.com">
-                        <label for="loginEmail">Email Address</label>
-                    </div>
-                    <div class="input-group">
-                        <input type="text" id="loginPassword" required placeholder="••••••••" 
-                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                               oninput="handlePasswordInput(event)">
-                        <label for="loginPassword">Password</label>
-                    </div>
-                    <button type="submit" class="btn-submit" id="loginSubmitBtn">Sign In</button>
-                </form>
+                <!-- About Section -->
+                <div id="aboutSection" class="form-section active about-content">
+                    <p>Welcome to <span class="highlight">TakeMe In</span>, a secure and minimalist OIDC identity provider.</p>
+                    <p>Register your application as a client to integrate our robust authentication flow into your systems seamlessly.</p>
+                    <p>Our platform ensures privacy, security, and a fluid user experience.</p>
+                </div>
 
                 <!-- Register Form -->
                 <form id="registerForm" class="form-section" onsubmit="handleRegister(event)">
                     <div class="input-group">
-                        <input type="text" id="registerName" required placeholder="John Doe">
-                        <label for="registerName">Full Name</label>
+                        <input type="text" id="regProjectName" required placeholder="My Application">
+                        <label for="regProjectName">Project Name</label>
                     </div>
                     <div class="input-group">
-                        <input type="email" id="registerEmail" required placeholder="name@example.com">
-                        <label for="registerEmail">Email Address</label>
+                        <input type="email" id="regClientEmail" required placeholder="client@example.com">
+                        <label for="regClientEmail">Client Email</label>
                     </div>
                     <div class="input-group">
-                        <input type="text" id="registerPassword" required placeholder="••••••••" 
+                        <input type="email" id="regSupportEmail" required placeholder="support@example.com">
+                        <label for="regSupportEmail">Support Email</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="url" id="regClientUri" required placeholder="https://myapp.com">
+                        <label for="regClientUri">Application URI</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="url" id="regRedirectUri" required placeholder="https://myapp.com/callback">
+                        <label for="regRedirectUri">Redirect URI</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="regPassword" required placeholder="••••••••" 
                                autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
-                               oninput="handlePasswordInput(event)">
-                        <label for="registerPassword">Password</label>
+                               oninput="handlePasswordInput(event, 'regPassword')">
+                        <label for="regPassword">Client Secret</label>
                     </div>
-                    <button type="submit" class="btn-submit" id="registerSubmitBtn">Create Account</button>
+                    <button type="submit" class="btn-submit" id="registerSubmitBtn">Register Client</button>
                 </form>
+
+                <!-- Dashboard Login Form -->
+                <form id="dashboardForm" class="form-section" onsubmit="handleLogin(event)">
+                    <div class="input-group">
+                        <input type="email" id="loginEmail" required placeholder="client@example.com">
+                        <label for="loginEmail">Client Email</label>
+                    </div>
+                    <div class="input-group">
+                        <input type="text" id="loginPassword" required placeholder="••••••••" 
+                               autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"
+                               oninput="handlePasswordInput(event, 'loginPassword')">
+                        <label for="loginPassword">Client Secret</label>
+                    </div>
+                    <button type="submit" class="btn-submit" id="loginSubmitBtn">Access Dashboard</button>
+                </form>
+
+                <!-- Client Info Display (Hidden by default) -->
+                <div id="clientInfoSection" class="form-section">
+                    <h3 style="margin-bottom: 1rem; font-weight: 400; color: var(--fuji-white); font-size: 1rem;">Client Credentials</h3>
+                    <div class="info-card">
+                        <div class="info-row">
+                            <div class="info-label">Project Name</div>
+                            <div class="info-value" id="infoProjectName">-</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Client ID</div>
+                            <div class="info-value" id="infoClientId">-</div>
+                        </div>
+                        <div class="info-row">
+                            <div class="info-label">Redirect URI</div>
+                            <div class="info-value" id="infoRedirectUri">-</div>
+                        </div>
+                    </div>
+                    <button class="btn-submit" onclick="logoutClient()" style="margin-top: 0;">Logout</button>
+                </div>
             </div>
         </div>
 
@@ -495,48 +599,45 @@
 
     <script>
         // Bento Tab Switching Logic
-        function switchTab(tab) {
-            const loginForm = document.getElementById('loginForm');
-            const registerForm = document.getElementById('registerForm');
-            const btnLogin = document.getElementById('btnLoginToggle');
-            const btnRegister = document.getElementById('btnRegisterToggle');
+        const tabs = ['about', 'register', 'dashboard', 'clientInfo'];
 
-            if (tab === 'login') {
-                btnLogin.classList.add('active');
-                btnRegister.classList.remove('active');
+        function switchTab(tab) {
+            tabs.forEach(t => {
+                const btn = document.getElementById(`btn${t.charAt(0).toUpperCase() + t.slice(1)}Toggle`);
+                const section = document.getElementById(`${t}Section`) || document.getElementById(`${t}Form`);
                 
-                registerForm.classList.remove('active');
-                registerForm.classList.add('exit');
-                
-                setTimeout(() => {
-                    loginForm.classList.remove('exit');
-                    loginForm.classList.add('active');
-                }, 50);
-                
-            } else {
-                btnRegister.classList.add('active');
-                btnLogin.classList.remove('active');
-                
-                loginForm.classList.remove('active');
-                loginForm.classList.add('exit');
-                
-                setTimeout(() => {
-                    registerForm.classList.remove('exit');
-                    registerForm.classList.add('active');
-                }, 50);
-            }
+                if (btn) btn.classList.remove('active');
+                if (section) {
+                    if (section.classList.contains('active')) {
+                        section.classList.remove('active');
+                        section.classList.add('exit');
+                    } else {
+                        section.classList.remove('active');
+                    }
+                }
+            });
+
+            const activeBtn = document.getElementById(`btn${tab.charAt(0).toUpperCase() + tab.slice(1)}Toggle`);
+            if (activeBtn) activeBtn.classList.add('active');
+
+            setTimeout(() => {
+                const activeSection = document.getElementById(`${tab}Section`) || document.getElementById(`${tab}Form`);
+                if (activeSection) {
+                    activeSection.classList.remove('exit');
+                    activeSection.classList.add('active');
+                }
+            }, 50);
         }
 
         // Shibui Password Masking Logic
         const actualPasswords = {
-            loginPassword: '',
-            registerPassword: ''
+            regPassword: '',
+            loginPassword: ''
         };
         const maskTimeouts = {};
 
-        function handlePasswordInput(e) {
+        function handlePasswordInput(e, id) {
             const el = e.target;
-            const id = el.id;
             const val = el.value;
             const oldActual = actualPasswords[id] || '';
             
@@ -609,86 +710,55 @@
             }, 6000);
         }
 
-        // Handle Login
-        async function handleLogin(e) {
-            e.preventDefault();
-            const btn = document.getElementById('loginSubmitBtn');
-            const email = document.getElementById('loginEmail').value;
-            const password = actualPasswords.loginPassword;
-
-            if (!password) {
-                showToast('Error', 'Please enter your password', 'error');
-                return;
-            }
-
-            try {
-                btn.classList.add('loading');
-                
-                const response = await fetch('/takemein/oidc/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email, password })
-                });
-
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return;
-                }
-
-                if (!response.ok) {
-                    const data = await response.json().catch(() => ({}));
-                    throw new Error(data.message || 'Invalid email or password');
-                }
-
-                const data = await response.json();
-                showToast('Success', 'Authentication successful', 'success');
-                
-                if (data.redirectUrl) {
-                    window.location.href = data.redirectUrl;
-                }
-
-            } catch (err) {
-                showToast('Authentication Failed', err.message, 'error');
-            } finally {
-                btn.classList.remove('loading');
-            }
+        function populateClientInfo(client) {
+            document.getElementById('infoProjectName').textContent = client.project_Name || '-';
+            document.getElementById('infoClientId').textContent = client._id || '-';
+            document.getElementById('infoRedirectUri').textContent = client.redirect_uri || '-';
         }
 
-        // Handle Register
+        // Handle Register Client
         async function handleRegister(e) {
             e.preventDefault();
             const btn = document.getElementById('registerSubmitBtn');
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = actualPasswords.registerPassword;
+            
+            const payload = {
+                project_Name: document.getElementById('regProjectName').value,
+                client_mail: document.getElementById('regClientEmail').value,
+                support_mail: document.getElementById('regSupportEmail').value,
+                client_uri: document.getElementById('regClientUri').value,
+                redirect_uri: document.getElementById('regRedirectUri').value,
+                client_secret: actualPasswords.regPassword
+            };
 
-            if (!password) {
-                showToast('Error', 'Please enter a password', 'error');
+            if (!payload.client_secret) {
+                showToast('Error', 'Please enter a client secret', 'error');
                 return;
             }
 
             try {
                 btn.classList.add('loading');
                 
-                const response = await fetch('/takemein/oidc/register', {
+                const response = await fetch('/takemein/registerclient', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ name, email, password, role: 'user' })
+                    body: JSON.stringify(payload)
                 });
 
                 const data = await response.json().catch(() => ({}));
 
                 if (!response.ok) {
-                    throw new Error(data.message || 'Registration failed. Please verify your information.');
+                    throw new Error(data.message || 'Registration failed.');
                 }
 
-                showToast('Success', data.message || 'Registration complete. Please log in.', 'success');
-                
+                showToast('Success', 'Client registered successfully.', 'success');
                 e.target.reset();
-                actualPasswords.registerPassword = '';
-                document.getElementById('registerPassword').value = '';
-                setTimeout(() => switchTab('login'), 1500);
-
+                actualPasswords.regPassword = '';
+                document.getElementById('regPassword').value = '';
+                
+                // Show info
+                populateClientInfo(data.data);
+                switchTab('clientInfo');
+                
             } catch (err) {
                 showToast('Registration Failed', err.message, 'error');
             } finally {
@@ -696,13 +766,54 @@
             }
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            if (window.location.pathname.includes('register')) {
-                switchTab('register');
-            } else {
-                switchTab('login');
+        // Handle Client Login
+        async function handleLogin(e) {
+            e.preventDefault();
+            const btn = document.getElementById('loginSubmitBtn');
+            const client_mail = document.getElementById('loginEmail').value;
+            const client_secret = actualPasswords.loginPassword;
+
+            if (!client_secret) {
+                showToast('Error', 'Please enter your client secret', 'error');
+                return;
             }
-        });
+
+            try {
+                btn.classList.add('loading');
+                
+                const response = await fetch('/takemein/clients/profile', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ client_mail, client_secret })
+                });
+
+                const data = await response.json().catch(() => ({}));
+
+                if (!response.ok) {
+                    throw new Error(data.message || 'Invalid credentials');
+                }
+
+                showToast('Success', 'Profile loaded', 'success');
+                
+                e.target.reset();
+                actualPasswords.loginPassword = '';
+                document.getElementById('loginPassword').value = '';
+
+                populateClientInfo(data.data);
+                switchTab('clientInfo');
+
+            } catch (err) {
+                showToast('Access Denied', err.message, 'error');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+
+        function logoutClient() {
+            switchTab('dashboard');
+            populateClientInfo({});
+            showToast('Logged Out', 'Successfully left client dashboard', 'success');
+        }
     </script>
 </body>
 </html>

@@ -5,7 +5,7 @@ class BaseDto {
     static schema = Joi.object({})
 
     static validate(data){
-        // Remember that this code is very specific to joi...
+        
         const {error,value} = this.schema.validate(data,{
             abortEarly:false,
             stripUnknown:true
