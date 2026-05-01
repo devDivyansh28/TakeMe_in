@@ -19,7 +19,7 @@ app.use(
   session({
     name: "oidc.sid", 
     secret: "takeMeIn123", 
-    resave: false, 
+    resave: true, 
     saveUninitialized: false,
     cookie: {
       httpOnly: true, 

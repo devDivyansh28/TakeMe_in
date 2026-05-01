@@ -54,6 +54,13 @@ const User =  mongoose.model("User", userSchema);
 
 const clientSchema = new mongoose.Schema(
   {
+    client_mail : {
+      type: String,
+      required: [true, "Email is required"],
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
     project_Name: {
       type: String,
       required: true,

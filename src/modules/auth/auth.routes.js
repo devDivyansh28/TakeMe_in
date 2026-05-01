@@ -7,7 +7,7 @@ import validate from "../../common/middleware/validate.middleware.js";
 import RegisterDto from "./dto/register.dto.js";
 
 import LoginDto  from "./dto/login.dto.js"
-
+import ClientLoginDto from "./dto/client.login.dto.js";
 import ClientDto from "./dto/client.dto.js";
 
 import { authenticate , authenticateClient} from "./auth.middleware.js";
@@ -20,14 +20,15 @@ router.get('/health',(req,res)=>{
 
 
 router.get("/takemein/register", (req, res) => {
-    return res.sendFile(process.cwd() + '/public/register.html');
+    return res.sendFile(process.cwd() + '/public/login.html');
 });
 
 router.get("/takemein/login", (req, res) => {
     return res.sendFile(process.cwd() + '/public/login.html');
 });
 
-router.get('/oidc/takeit',authenticateClient,controller.takeit);
+router.get('/oidc/takeit',authenticateClient,(req, res) => {
+    return res.sendFile(process.cwd() + '/public/login.html')});
 
 router.post("/takemein/oidc/register", validate(RegisterDto), controller.register);
 
@@ -35,6 +36,7 @@ router.post("/takemein/oidc/login",validate(LoginDto) , controller.login)
 
 
 router.post('/takemein/registerclient',validate(ClientDto) , controller.registerClient);
+router.post('/takemein/clients/profile',validate(ClientLoginDto) , controller.clientProfile)
 // router.get("/takemein/me", authenticate, controller.getMe)
 
 // router.post("/login",validate(LoginDto),controller.login)

@@ -2,15 +2,9 @@ import Joi from "joi";
 
 import BaseDto from "../../../common/dto/base.dto.js";
 
-class ClientDto extends BaseDto {
+class ClientLoginDto extends BaseDto {
   static schema = Joi.object({
     client_mail: Joi.string().email().lowercase().required(),
-    project_Name: Joi.string().min(3).max(100).trim().lowercase().required(),
-    client_uri: Joi.string().uri().required(),
-
-    support_mail: Joi.string().email().lowercase().required(),
-    redirect_uri: Joi.string().uri().required(),
-
     client_secret: Joi.string()
       .min(8)
       .pattern(/(?=.*[A-Z])(?=.*\d)/)
@@ -21,4 +15,4 @@ class ClientDto extends BaseDto {
   });
 }
 
-export default ClientDto;
+export default ClientLoginDto;

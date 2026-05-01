@@ -42,6 +42,7 @@ const register = async ({ name, email, password, role }) => {
 };
 
 const login = async ({ email, password, client_id, redirect_uri }) => {
+ 
   if (!client_id || !redirect_uri) {
     throw ApiError.unauthorized("Session Expired");
   }
@@ -84,20 +85,22 @@ const login = async ({ email, password, client_id, redirect_uri }) => {
 };
 
 const registerClient = async ({
+  client_mail,
   project_Name,
-  client_url,
+  client_uri,
   support_mail,
-  redirect_url,
+  redirect_uri,
   client_secret,
 }) => {
   const existing = await Client.findOne({ project_Name });
   if (existing) throw ApiError.conflict("Project Already Exists");
 
   const client = await Client.create({
+    client_mail,
     project_Name,
-    client_url,
+    client_uri,
     support_mail,
-    redirect_url,
+    redirect_uri,
     client_secret,
   });
 
@@ -173,6 +176,18 @@ const getPublicToken = async () => {
   };
 };
 
+
+const clientProfile = async ({client_mail , client_secret})=>{
+  const client = await Client.findOne({client_mail}).select('+client_secret');
+  if(!client) throw ApiError.unauthorized("Client not registered");
+
+  const isValid = await client.comparePassword(client_secret);
+  if(!isValid) throw ApiError.unauthorized("Invalid credentials");
+
+  const clientObj = client.toObject();
+  delete clientObj.client_secret;
+  return clientObj;
+}
 // const login = async ({email,password})=>{
 //     // I think first work should be to find in database whether that email exist or not...
 //     const user = await User.findOne({email}).select('+password')
@@ -267,6 +282,7 @@ export {
   userinfo,
   getPublicToken,
   registerClient,
+  clientProfile,
   // , login , refresh , logout , forgotPassword , getMe , verifyEmail
 };
 

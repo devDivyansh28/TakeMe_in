@@ -58,10 +58,14 @@ const getPublicToken = async (req,res)=>{
 }
 
 const login = async (req,res)=>{
+   
     const {email , password}= req.body;
     if(!req.session) throw ApiError.unauthorized("Session is missing")
     const client_id = req.session.client_id;
     const redirect_uri = req.session.redirect_uri;
+    
+   
+    
     const {code , redirectTo} = await authService.login({email , password , client_id , redirect_uri});
 
     // res.cookie("accesstoken",token,{
@@ -86,11 +90,14 @@ const userinfo = async (req,res)=>{
     ApiResponse.ok(res,"User Profile",user);
 }
 
-
+const clientProfile = async (req,res)=>{
+  const client = await authService.clientProfile(req.body);
+  ApiResponse.ok(res,"Client Profile",client);
+}
 
 // const getMe = async (req,res)=>{
 //     const user = await authService.getMe(req.user.id);
 //     ApiResponse.ok(res,"User Profile",user);
 // }
 
-export { register , login , oidc , takeit , handleToken , userinfo , getPublicToken , registerClient };
+export { register , login , oidc , takeit , handleToken , userinfo , getPublicToken , registerClient , clientProfile };
