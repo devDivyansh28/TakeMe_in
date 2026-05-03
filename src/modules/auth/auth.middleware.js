@@ -44,7 +44,8 @@ const authenticate = async (req, res, next) => {
 const authenticateClient = async (req, res, next) => {
   try {
     
-    const { client_id, redirect_uri } = req.query;
+    const { client_id , redirect_uri} = req.query;
+  
 
     if (!client_id || !redirect_uri) {
       throw ApiError.badRequest("Missing client_id or redirect_uri");
@@ -60,10 +61,10 @@ const authenticateClient = async (req, res, next) => {
       throw ApiError.unauthorized("Invalid redirect URI");
     }
 
+
     req.session.client_id = client_id;
     req.session.redirect_uri = redirect_uri;
     
-
     next();
     
   } catch (error) {

@@ -615,6 +615,7 @@
             const btn = document.getElementById('loginSubmitBtn');
             const email = document.getElementById('loginEmail').value;
             const password = actualPasswords.loginPassword;
+           
 
             if (!password) {
                 showToast('Error', 'Please enter your password', 'error');
@@ -623,37 +624,33 @@
 
             try {
                 btn.classList.add('loading');
-                
                 const response = await fetch('/takemein/oidc/login', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ email, password })
                 });
-
-                if (response.redirected) {
-                    window.location.href = response.url;
-                    return;
-                }
-
-                if (!response.ok) {
-                    const data = await response.json().catch(() => ({}));
-                    throw new Error(data.message || 'Invalid email or password');
-                }
-
-                const data = await response.json();
-                showToast('Success', 'Authentication successful', 'success');
                 
-                if (data.redirectUrl) {
-                    window.location.href = data.redirectUrl;
+                 let data = {};
+                 try {
+                data = await response.json(); // ✅ read ONLY ONCE
+                } catch (e) {
+                data = {};
                 }
-
-            } catch (err) {
-                showToast('Authentication Failed', err.message, 'error');
+                if (response.ok) {
+                const { redirectUrl } = data;
+                window.location.href = redirectUrl;
+                showToast('Success', 'Authentication successful', 'success');
+                 } else {
+                throw new Error(data.message || 'Invalid email or password');
+                btn.classList.remove('loading');
+                }
+            } 
+            catch (err) {
+               showToast('Login Failed', err.message, 'error');
             } finally {
                 btn.classList.remove('loading');
-            }
+            }     
         }
-
         // Handle Register
         async function handleRegister(e) {
             e.preventDefault();

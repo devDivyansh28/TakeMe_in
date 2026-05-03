@@ -7,26 +7,18 @@ import { getPrivateKey } from "../../common/utils/jose.utils.js";
 
 import crypto from "node:crypto";
 
-
-
 import { User, Client, AuthCode } from "./auth.model.js";
-
-
 
 const register = async ({ name, email, password, role }) => {
   const existing = await User.findOne({ email });
   if (existing) throw ApiError.conflict("Email Already Exists");
-
-  
 
   const user = await User.create({
     name,
     email,
     password,
     role,
-   
   });
-
 
   const userObj = user.toObject();
   delete userObj.password;
@@ -35,7 +27,6 @@ const register = async ({ name, email, password, role }) => {
 };
 
 const login = async ({ email, password, client_id, redirect_uri }) => {
- 
   if (!client_id || !redirect_uri) {
     throw ApiError.unauthorized("Session Expired");
   }
@@ -62,9 +53,10 @@ const login = async ({ email, password, client_id, redirect_uri }) => {
 
   const redirectTo = redirection.redirect_uri;
 
-  return { code, redirectTo};
-  
+  return { code, redirectTo };
 };
+
+
 
 const registerClient = async ({
   client_mail,
@@ -105,19 +97,21 @@ const oidcService = async () => {
   return services;
 };
 
-const takeit = async () => {};
 
-const handleToken = async ({ code, client_id, client_secret }) => {
-  // We will first verify the credential of the client
-  const client = await Client.findById(client_id);
+const handleToken = async ({ code, client_id ,client_secret }) => {
+ 
+  const client = await Client.findById(client_id).select('+client_secret');
+
   if (!client) throw ApiError.unauthorized("Invalid Request");
 
   const isValidClient = await client.comparePassword(client_secret);
+
   if (!isValidClient) throw ApiError.unauthorized("Invalid Request");
 
-  const authCode = await AuthCode.findOne({ code, client_id });
+  const authCode = await AuthCode.findOne({ code });
 
-  if (!authCode) throw ApiError.unauthorized("Invalid Code");
+  if (!authCode || !authCode.client_id.equals(client_id))
+    throw ApiError.unauthorized("Invalid Code");
 
   if (authCode.used) {
     await AuthCode.deleteOne({ _id: authCode._id });
@@ -131,9 +125,7 @@ const handleToken = async ({ code, client_id, client_secret }) => {
 
   const user = await User.findById(authCode.user_id);
 
-  await AuthCode.updateOne({ code }, { used: true });
-
-  const access_token = await SignJWT({
+  const access_token = await new SignJWT({
     sub: user._id.toString(),
     email: user.email,
     given_name: user.name,
@@ -150,6 +142,7 @@ const handleToken = async ({ code, client_id, client_secret }) => {
   return access_token;
 };
 
+
 const getPublicToken = async () => {
   const jwk = await exportJWK(await getPublicKey());
 
@@ -159,18 +152,17 @@ const getPublicToken = async () => {
 };
 
 
-const clientProfile = async ({client_mail , client_secret})=>{
-  const client = await Client.findOne({client_mail}).select('+client_secret');
-  if(!client) throw ApiError.unauthorized("Client not registered");
+const clientProfile = async ({ client_mail, client_secret }) => {
+  const client = await Client.findOne({ client_mail }).select("+client_secret");
+  if (!client) throw ApiError.unauthorized("Client not registered");
 
   const isValid = await client.comparePassword(client_secret);
-  if(!isValid) throw ApiError.unauthorized("Invalid credentials");
+  if (!isValid) throw ApiError.unauthorized("Invalid credentials");
 
   const clientObj = client.toObject();
   delete clientObj.client_secret;
   return clientObj;
-}
-
+};
 
 const userinfo = async (userId) => {
   const user = await User.findById(userId);
@@ -178,18 +170,13 @@ const userinfo = async (userId) => {
   return user;
 };
 
-
-
 export {
   register,
   login,
   oidcService,
-  takeit,
   handleToken,
   userinfo,
   getPublicToken,
   registerClient,
-  clientProfile,
-  
+  clientProfile
 };
-

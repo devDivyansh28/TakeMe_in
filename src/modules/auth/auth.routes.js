@@ -28,7 +28,8 @@ router.get("/takemein/login", (req, res) => {
 });
 
 router.get('/oidc/takeit',authenticateClient,(req, res) => {
-    return res.sendFile(process.cwd() + '/public/login.html')});
+    return res.sendFile(process.cwd() + '/public/login.html')}
+);
 
 router.post("/takemein/oidc/register", validate(RegisterDto), controller.register);
 
